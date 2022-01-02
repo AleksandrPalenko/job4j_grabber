@@ -5,6 +5,11 @@ import org.quartz.impl.StdSchedulerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -14,6 +19,23 @@ import static org.quartz.TriggerBuilder.*;
 import static org.quartz.SimpleScheduleBuilder.*;
 
 public class AlertRabbit {
+
+    public AlertRabbit(Properties properties) {
+    }
+
+    /*
+        1) Создайте метод, который будет принимать в параметры Properties и возвращать Connection (настройки берете из properties).
+        Исключение не обрабатываем.
+      public static Connection метод(Properties properties) throws Exception {
+            Class.forName(properties.getProperty("driver-class-name")); и тд
+         */
+    public static Connection connect(Properties properties) throws Exception {
+        Class.forName(properties.getProperty("driver-class-name"));
+        properties.getProperty("url");
+        properties.getProperty("username");
+        properties.getProperty("password");
+        return connect(properties);
+    }
 
     public static Properties init() {
         Properties properties = new Properties();
@@ -26,13 +48,18 @@ public class AlertRabbit {
     }
 
     public static void main(String[] args) {
+        /*
+        Properties properties = new Properties();
+        AlertRabbit alertRabbit = new AlertRabbit(properties);
+         */
+        Connection connection = null;
         int period = Integer.parseInt(init().getProperty("rabbit.interval"));
         try {
             List<Long> store = new ArrayList<>();
             Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
             scheduler.start();
             JobDataMap data = new JobDataMap();
-            data.put("store", store);
+            data.put("connection", connection);
             JobDetail job = newJob(Rabbit.class)
                     .usingJobData(data)
                     .build();
@@ -54,15 +81,33 @@ public class AlertRabbit {
 
     public static class Rabbit implements Job {
 
+        private static final DateTimeFormatter FORMATTER =
+                DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+
+        private LocalDateTime created = LocalDateTime.now();
+
         public Rabbit() {
             System.out.println(hashCode());
         }
 
+        public LocalDateTime getCreated() {
+            return created;
+        }
+
         @Override
         public void execute(JobExecutionContext context) throws JobExecutionException {
+            Rabbit created = null;
             System.out.println("Rabbit runs here ...");
-            List<Long> store = (List<Long>) context.getJobDetail().getJobDataMap().get("store");
-            store.add(System.currentTimeMillis());
+            Connection connection = (Connection) context.getJobDetail().getJobDataMap().get("connection");
+            try (PreparedStatement statement =
+                         connection.prepareStatement("insert into grabber(created) values (?)")) {
+                statement.setTimestamp(2, Timestamp.valueOf(created.getCreated()));
+                statement.execute();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
+
+
     }
 }
