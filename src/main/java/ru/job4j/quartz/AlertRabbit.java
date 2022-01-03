@@ -6,10 +6,10 @@ import org.quartz.impl.StdSchedulerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -23,18 +23,16 @@ public class AlertRabbit {
     public AlertRabbit(Properties properties) {
     }
 
-    /*
-        1) Создайте метод, который будет принимать в параметры Properties и возвращать Connection (настройки берете из properties).
-        Исключение не обрабатываем.
-      public static Connection метод(Properties properties) throws Exception {
-            Class.forName(properties.getProperty("driver-class-name")); и тд
-         */
     public static Connection connect(Properties properties) throws Exception {
-        Class.forName(properties.getProperty("driver-class-name"));
-        properties.getProperty("url");
-        properties.getProperty("username");
-        properties.getProperty("password");
-        return connect(properties);
+        try (InputStream in = AlertRabbit.class.getClassLoader()
+                .getResourceAsStream("rabbit.properties")) {
+            properties.load(in);
+            Class.forName(properties.getProperty("driver-class-name"));
+            return DriverManager.getConnection(
+                    properties.getProperty("url"),
+                    properties.getProperty("username"),
+                    properties.getProperty("password"));
+        }
     }
 
     public static Properties init() {
@@ -50,8 +48,7 @@ public class AlertRabbit {
     public static void main(String[] args) throws Exception {
         Properties properties = init();
         try (Connection connection = connect(properties)) {
-        int period = Integer.parseInt(init().getProperty("rabbit.interval"));
-            List<Long> store = new ArrayList<>();
+            int period = Integer.parseInt(init().getProperty("rabbit.interval"));
             Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
             scheduler.start();
             JobDataMap data = new JobDataMap();
@@ -69,7 +66,7 @@ public class AlertRabbit {
             scheduler.scheduleJob(job, trigger);
             Thread.sleep(5000);
             scheduler.shutdown();
-            System.out.println(store);
+            System.out.println(connection);
         } catch (SchedulerException | InterruptedException e) {
             e.printStackTrace();
         }
