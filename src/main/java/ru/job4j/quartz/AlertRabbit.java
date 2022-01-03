@@ -2,6 +2,8 @@ package ru.job4j.quartz;
 
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,8 +12,6 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
 
 import static org.quartz.JobBuilder.*;
@@ -20,19 +20,17 @@ import static org.quartz.SimpleScheduleBuilder.*;
 
 public class AlertRabbit {
 
+    private static final Logger LOG = LoggerFactory.getLogger(AlertRabbit.class.getName());
+
     public AlertRabbit(Properties properties) {
     }
 
     public static Connection connect(Properties properties) throws Exception {
-        try (InputStream in = AlertRabbit.class.getClassLoader()
-                .getResourceAsStream("rabbit.properties")) {
-            properties.load(in);
             Class.forName(properties.getProperty("driver-class-name"));
             return DriverManager.getConnection(
                     properties.getProperty("url"),
                     properties.getProperty("username"),
                     properties.getProperty("password"));
-        }
     }
 
     public static Properties init() {
@@ -40,12 +38,12 @@ public class AlertRabbit {
         try (InputStream in = AlertRabbit.class.getClassLoader().getResourceAsStream("rabbit.properties")) {
             properties.load(in);
         } catch (IOException e) {
-            e.printStackTrace();
+            LOG.error(e.getMessage(), e);
         }
         return properties;
     }
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         Properties properties = init();
         try (Connection connection = connect(properties)) {
             int period = Integer.parseInt(init().getProperty("rabbit.interval"));
@@ -67,8 +65,8 @@ public class AlertRabbit {
             Thread.sleep(5000);
             scheduler.shutdown();
             System.out.println(connection);
-        } catch (SchedulerException | InterruptedException e) {
-            e.printStackTrace();
+        } catch (Exception er) {
+            LOG.error(er.getMessage(), er);
         }
     }
 
@@ -86,8 +84,8 @@ public class AlertRabbit {
                          connection.prepareStatement("insert into rabbit(created) values (?)")) {
                 statement.setTimestamp(1, Timestamp.valueOf(LocalDateTime.now()));
                 statement.execute();
-            } catch (Exception e) {
-                e.printStackTrace();
+            } catch (Exception ew) {
+                LOG.error(ew.getMessage(), ew);
             }
         }
 
