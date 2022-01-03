@@ -47,14 +47,10 @@ public class AlertRabbit {
         return properties;
     }
 
-    public static void main(String[] args) {
-        /*
-        Properties properties = new Properties();
-        AlertRabbit alertRabbit = new AlertRabbit(properties);
-         */
-        Connection connection = null;
+    public static void main(String[] args) throws Exception {
+        Properties properties = init();
+        try (Connection connection = connect(properties)) {
         int period = Integer.parseInt(init().getProperty("rabbit.interval"));
-        try {
             List<Long> store = new ArrayList<>();
             Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
             scheduler.start();
@@ -81,27 +77,17 @@ public class AlertRabbit {
 
     public static class Rabbit implements Job {
 
-        private static final DateTimeFormatter FORMATTER =
-                DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
-
-        private LocalDateTime created = LocalDateTime.now();
-
         public Rabbit() {
             System.out.println(hashCode());
         }
 
-        public LocalDateTime getCreated() {
-            return created;
-        }
-
         @Override
         public void execute(JobExecutionContext context) throws JobExecutionException {
-            Rabbit created = null;
             System.out.println("Rabbit runs here ...");
             Connection connection = (Connection) context.getJobDetail().getJobDataMap().get("connection");
             try (PreparedStatement statement =
-                         connection.prepareStatement("insert into grabber(created) values (?)")) {
-                statement.setTimestamp(2, Timestamp.valueOf(created.getCreated()));
+                         connection.prepareStatement("insert into rabbit(created) values (?)")) {
+                statement.setTimestamp(1, Timestamp.valueOf(LocalDateTime.now()));
                 statement.execute();
             } catch (Exception e) {
                 e.printStackTrace();
