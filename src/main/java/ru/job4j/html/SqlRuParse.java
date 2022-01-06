@@ -4,16 +4,24 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import ru.job4j.grabber.utils.DateTimeParser;
+import ru.job4j.grabber.utils.SqlRuDateTimeParser;
 
 public class SqlRuParse {
     public static void main(String[] args) throws Exception {
-        Document doc = Jsoup.connect("https://www.sql.ru/forum/job-offers").get();
+        String str = "https://www.sql.ru/forum/job-offers";
+        String plusStr = str;
+        for (int i = 0; i <= 5; i++) {
+            plusStr = str + "/" + i;
+        }
+        DateTimeParser dateTimeParser = new SqlRuDateTimeParser();
+        Document doc = Jsoup.connect(plusStr).get();
         Elements row = doc.select(".postslisttopic");
         for (Element td : row) {
-            Element href = td.child(0);
-            System.out.println(href.attr("href"));
-            System.out.println(href.text());
-            System.out.println(td.parent().child(5).text());
+            Element href = td.parent();
+            System.out.println(href.child(1).child(0).attr("href"));
+            System.out.println(href.child(1).text());
+            System.out.println(dateTimeParser.parse(href.child(5).text()));
         }
     }
 }
