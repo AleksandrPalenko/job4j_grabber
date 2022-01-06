@@ -28,4 +28,20 @@ public class SqlRuDateTimeParserTest {
         LocalDateTime rsl = new SqlRuDateTimeParser().parse(data);
         assertThat(rsl, is(expected));
     }
+
+    @Test
+    public void whenFullDateWithTime() throws IOException {
+        String data = "25 июн 18, 21:56";
+        LocalDateTime expected = LocalDateTime.of(2018, 6, 25, 21, 56);
+        LocalDateTime rsl = new SqlRuDateTimeParser().parse(data);
+        assertThat(rsl, is(expected));
+    }
+
+    @Test
+    public void whenDataWithYesterday() throws IOException {
+        String data = "вчера, 14:20";
+        LocalDateTime expected = LocalDateTime.of(LocalDate.now().minusDays(1), LocalTime.of(14, 20));
+        LocalDateTime rsl = new SqlRuDateTimeParser().parse(data);
+        assertThat(rsl, is(expected));
+    }
 }

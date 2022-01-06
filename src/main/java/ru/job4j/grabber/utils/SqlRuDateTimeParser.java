@@ -39,7 +39,7 @@ public class SqlRuDateTimeParser implements DateTimeParser {
 "20 дек 21, 19:48"
 вчера, 13:19                                       parse = "20 дек 21, 19:48"
          */
-        String[] data = parse.split(","); /*  на 2 части "20 дек 21" и "19:48".*/
+        String[] data = parse.split(", "); /*  на 2 части "20 дек 21" и "19:48".*/
         String[] newData = data[0].split(" ");
         String[] time = data[1].split(":");
         LocalTime timeDate = LocalTime.of(Integer.parseInt(time[0]),
@@ -60,17 +60,13 @@ public class SqlRuDateTimeParser implements DateTimeParser {
                 if (newData[1].contains(map)) {
                     monthData = MONTHS.get(newData[1]);
                 }
-                /*
-                rsl = LocalDateTime.of(Integer.parseInt(newData[2] + 2000,
-                        monthData,
+
+                rsl = LocalDateTime.of(Integer.parseInt(newData[2] + 2000
+                        ), Integer.parseInt(monthData),
                         Integer.parseInt(newData[0]),
-                        timeDate
-
-                );
-
-                 */
+                        Integer.parseInt(time[0]),
+                        Integer.parseInt(time[1]));
             }
-
         }
         return rsl;
     }
