@@ -1,5 +1,12 @@
 package ru.job4j.grabber;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
+import ru.job4j.grabber.utils.DateTimeParser;
+import ru.job4j.grabber.utils.SqlRuDateTimeParser;
+
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -39,5 +46,13 @@ public class Post {
     @Override
     public int hashCode() {
         return Objects.hash(id, title, link, description);
+    }
+
+    public static void main(String[] args) throws IOException {
+        Document doc = Jsoup.connect("https://www.sql.ru/forum/1325330/lidy-be-fe-senior-cistemnye-analitiki-qa-i-devops-moskva-do-200t").get();
+        Elements desc = doc.select(".msgBody");
+        Elements date = doc.select(".msgFooter");
+        System.out.println(desc.get(1).parent().child(1).text());
+        System.out.println(date.get(0).text().substring(0, 16));
     }
 }
