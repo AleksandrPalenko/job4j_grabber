@@ -16,7 +16,7 @@ public class SqlRuDateTimeParserTest {
     @Test
     public void whenDataFromOut() throws IOException {
         String data = "20 дек 21, 19:48";
-        LocalDateTime expected = LocalDateTime.of(2020, 12, 21, 19, 48);
+        LocalDateTime expected = LocalDateTime.of(2021, 12, 20, 19, 48);
         LocalDateTime rsl = new SqlRuDateTimeParser().parse(data);
         assertThat(rsl, is(expected));
     }
