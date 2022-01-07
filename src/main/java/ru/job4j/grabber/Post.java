@@ -40,12 +40,12 @@ public class Post {
         return id == post.id
                 && Objects.equals(title, post.title)
                 && Objects.equals(link, post.link)
-                && Objects.equals(description, post.description);
+                && Objects.equals(created, post.created);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, title, link, description);
+        return Objects.hash(id, title, link, created);
     }
 
     public static void main(String[] args) throws IOException {
