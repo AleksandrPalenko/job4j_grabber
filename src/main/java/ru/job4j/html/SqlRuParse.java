@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class SqlRuParse {
 
@@ -38,25 +39,22 @@ public class SqlRuParse {
         /*в list нужно добавить цикл для парсинга 5 страниц и,
     используя ссылки на вакансии, парсить их в Post методом detail.
     */
-        List<Post> post = new ArrayList<>();
-        Post postLnk = new Post();
+        List<Post> postOfLIst = new ArrayList<>();
         for (int i = 1; i <= 5; i++) {
-            DateTimeParser dateTimeParser = new SqlRuDateTimeParser();
             Document doc = Jsoup.connect(link + "/" + i).get();
             Elements row = doc.select(".postslisttopic");
             for (Element td : row) {
                 Element href = td.parent();
-                if (postLnk.getTitle().contains("java")
-                        || postLnk.getTitle().contains("Java")
-                        || postLnk.getTitle().contains("JAVA")) {
-                    post.add(detail(link));
+                String linkForPost = href.attr("href");
+                String linkPost = String.valueOf(href.select(".messageHeader"));
+                if (linkPost.toLowerCase(Locale.ROOT).contains("java")
+                        && !linkPost.toLowerCase(Locale.ROOT).contains("javaScript")) {
+                    Post post = detail(linkForPost);
+                    postOfLIst.add(post);
                 }
-                System.out.println(href.child(1).child(0).attr("href"));
-                System.out.println(href.child(1).text());
-                System.out.println(dateTimeParser.parse(href.child(5).text()));
             }
         }
-        return post;
+        return postOfLIst;
     }
 
     Post detail(String link) throws IOException {
@@ -72,4 +70,10 @@ public class SqlRuParse {
         return post;
     }
 
+    public static void main(String[] args) throws IOException {
+        SqlRuDateTimeParser dateTimeParser = new SqlRuDateTimeParser();
+        SqlRuParse sqlRuParse =  new SqlRuParse(dateTimeParser);
+        //System.out.println(sqlRuParse.detail("https://www.sql.ru/forum/1323839/razrabotchik-java-g-kazan"));
+        System.out.println(sqlRuParse.list("https://www.sql.ru/forum/job-offers/1"));
+    }
 }
