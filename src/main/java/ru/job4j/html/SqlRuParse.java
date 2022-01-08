@@ -49,7 +49,7 @@ public class SqlRuParse {
                 String linkPost = String.valueOf(href.select(".messageHeader"));
                 if (linkPost.toLowerCase(Locale.ROOT).contains("java")
                         && !linkPost.toLowerCase(Locale.ROOT).contains("javaScript")) {
-                    Post post = detail(linkForPost);
+                    Post post = detail(linkPost);
                     postOfLIst.add(post);
                 }
             }
@@ -73,7 +73,7 @@ public class SqlRuParse {
     public static void main(String[] args) throws IOException {
         SqlRuDateTimeParser dateTimeParser = new SqlRuDateTimeParser();
         SqlRuParse sqlRuParse =  new SqlRuParse(dateTimeParser);
-        //System.out.println(sqlRuParse.detail("https://www.sql.ru/forum/1323839/razrabotchik-java-g-kazan"));
+        System.out.println(sqlRuParse.detail("https://www.sql.ru/forum/1323839/razrabotchik-java-g-kazan"));
         System.out.println(sqlRuParse.list("https://www.sql.ru/forum/job-offers/1"));
     }
 }
