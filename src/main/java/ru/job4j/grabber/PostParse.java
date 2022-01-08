@@ -21,7 +21,7 @@ public class PostParse {
         Post post = new Post();
         Document doc = Jsoup.connect(link).get();
         post.setTitle(doc.select(".messageHeader").get(0).text());
-        post.setDescription(doc.select(".content-wrapper-forum").get(0).text());
+        post.setDescription(doc.select(".msgBody").get(0).text());
         post.setLink(link);
         SqlRuDateTimeParser dateTimeParser = new SqlRuDateTimeParser();
         String date = doc.select(".msgFooter").get(0).text().substring(0, 16);
@@ -32,6 +32,6 @@ public class PostParse {
 
     public static void main(String[] args) throws IOException {
         PostParse parse = new PostParse();
-        parse.details("https://www.sql.ru/forum/1325330/lidy-be-fe-senior-cistemnye-analitiki-qa-i-devops-moskva-do-200t");
+        System.out.println(parse.details("https://www.sql.ru/forum/1325330/lidy-be-fe-senior-cistemnye-analitiki-qa-i-devops-moskva-do-200t"));
     }
 }
