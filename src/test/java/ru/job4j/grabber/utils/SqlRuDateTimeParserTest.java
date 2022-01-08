@@ -1,6 +1,5 @@
 package ru.job4j.grabber.utils;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.IOException;

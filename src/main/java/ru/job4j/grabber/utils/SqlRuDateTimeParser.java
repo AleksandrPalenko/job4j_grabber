@@ -36,7 +36,6 @@ public class SqlRuDateTimeParser implements DateTimeParser {
         LocalTime timeDate = LocalTime.of(Integer.parseInt(time[0]),
                 Integer.parseInt(time[1])
         );
-        String monthData = null;
         LocalDateTime rsl;
         if ("сегодня".contains(data[0])) {
             rsl = LocalDateTime.of(LocalDate.now(),
@@ -47,14 +46,8 @@ public class SqlRuDateTimeParser implements DateTimeParser {
                     timeDate
             );
         } else {
-            for (String map : MONTHS.keySet()) {
-                if (newData[1].contains(map)) {
-                    monthData = MONTHS.get(newData[1]);
-                }
-            }
-            assert monthData != null;
             rsl = LocalDateTime.of(Integer.parseInt(newData[2]) + 2000,
-                    Integer.parseInt(monthData),
+                    Integer.parseInt(MONTHS.get(newData[1])),
                     Integer.parseInt(newData[0]),
                     Integer.parseInt(time[0]),
                     Integer.parseInt(time[1]));
