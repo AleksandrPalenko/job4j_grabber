@@ -1,12 +1,6 @@
 package ru.job4j.grabber;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.select.Elements;
-
-import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Objects;
 
 public class Post {
@@ -23,6 +17,13 @@ public class Post {
 
     public Post(int id, String title, String link, String description, LocalDateTime created) {
         this.id = id;
+        this.title = title;
+        this.link = link;
+        this.description = description;
+        this.created = created;
+    }
+
+    public Post(String title, String link, String description, LocalDateTime created) {
         this.title = title;
         this.link = link;
         this.description = description;
@@ -99,4 +100,5 @@ public class Post {
     public int hashCode() {
         return Objects.hash(id, title, link, created);
     }
+
 }
