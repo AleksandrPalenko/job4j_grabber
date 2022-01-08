@@ -48,4 +48,18 @@ public class SqlRuParse {
         return post;
     }
 
+    public static void main(String[] args) throws Exception {
+        String str = "https://www.sql.ru/forum/job-offers";
+        for (int i = 1; i <= 5; i++) {
+            DateTimeParser dateTimeParser = new SqlRuDateTimeParser();
+            Document doc = Jsoup.connect(str + "/" + i).get();
+            Elements row = doc.select(".postslisttopic");
+            for (Element td : row) {
+                Element href = td.parent();
+                System.out.println(href.child(1).child(0).attr("href"));
+                System.out.println(href.child(1).text());
+                System.out.println(dateTimeParser.parse(href.child(5).text()));
+            }
+        }
+    }
 }
