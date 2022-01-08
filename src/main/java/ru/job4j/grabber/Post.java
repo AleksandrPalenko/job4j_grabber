@@ -6,14 +6,68 @@ import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 
 public class Post {
+
     private int id;
     private String title;
     private String link;
     private String description;
-    LocalDateTime created;
+    private LocalDateTime created;
+
+    public Post() {
+
+    }
+
+    public Post(int id, String title, String link, String description, LocalDateTime created) {
+        this.id = id;
+        this.title = title;
+        this.link = link;
+        this.description = description;
+        this.created = created;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getLink() {
+        return link;
+    }
+
+    public void setLink(String link) {
+        this.link = link;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public LocalDateTime getCreated() {
+        return created;
+    }
+
+    public void setCreated(LocalDateTime created) {
+        this.created = created;
+    }
 
     @Override
     public String toString() {
@@ -44,13 +98,5 @@ public class Post {
     @Override
     public int hashCode() {
         return Objects.hash(id, title, link, created);
-    }
-
-    public static void main(String[] args) throws IOException {
-        Document doc = Jsoup.connect("https://www.sql.ru/forum/1325330/lidy-be-fe-senior-cistemnye-analitiki-qa-i-devops-moskva-do-200t").get();
-        Elements desc = doc.select(".msgBody");
-        Elements date = doc.select(".msgFooter");
-        System.out.println(desc.get(1).parent().child(1).text());
-        System.out.println(date.get(0).text().substring(0, 16));
     }
 }
