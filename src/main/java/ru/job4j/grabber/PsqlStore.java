@@ -130,4 +130,5 @@ public class PsqlStore implements Store, AutoCloseable {
             ps.save(post.get(i));
         }
     }
+
 }
