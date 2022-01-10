@@ -35,13 +35,13 @@ public class SqlRuParse {
      * @return модель с данными.
      */
 
-    List<Post> list(String link) throws IOException {
+    public List<Post> list(String link) throws IOException {
         /*в list нужно добавить цикл для парсинга 5 страниц и,
     используя ссылки на вакансии, парсить их в Post методом detail.
     */
         List<Post> postOfLIst = new ArrayList<>();
         for (int i = 1; i <= 5; i++) {
-            Document doc = Jsoup.connect(link + "/" + i).get();
+            Document doc = Jsoup.connect(link + i).get();
             Elements row = doc.select(".postslisttopic");
             for (Element td : row) {
                 Element href = td.child(0);
@@ -59,12 +59,11 @@ public class SqlRuParse {
 
     Post detail(String link) throws IOException {
         Post post = new Post();
-        Document doc = Jsoup.connect("https://www.sql.ru/forum/1323839/razrabotchik-java-g-kazan").get();
+        Document doc = Jsoup.connect(link).get();
         post.setTitle(doc.select(".messageHeader").get(0).text());
-        post.setDescription(doc.select(".msgBody").get(0).text());
+        post.setDescription(doc.select(".msgBody").get(1).text());
         post.setLink(link);
-        SqlRuDateTimeParser dateTimeParser = new SqlRuDateTimeParser();
-        String date = doc.select(".msgFooter").get(0).text().substring(0, 16);
+        String date = doc.select(".msgFooter").get(0).text().substring(0, 16).trim();
         LocalDateTime localDateTime = dateTimeParser.parse(date);
         post.setCreated(localDateTime);
         return post;
@@ -72,8 +71,8 @@ public class SqlRuParse {
 
     public static void main(String[] args) throws IOException {
         SqlRuDateTimeParser dateTimeParser = new SqlRuDateTimeParser();
-        SqlRuParse sqlRuParse =  new SqlRuParse(dateTimeParser);
+        SqlRuParse sqlRuParse = new SqlRuParse(dateTimeParser);
         System.out.println(sqlRuParse.detail("https://www.sql.ru/forum/1323839/razrabotchik-java-g-kazan"));
-        System.out.println(sqlRuParse.list("https://www.sql.ru/forum/job-offers/1"));
+        System.out.println(sqlRuParse.list("https://www.sql.ru/forum/job-offers/"));
     }
 }
