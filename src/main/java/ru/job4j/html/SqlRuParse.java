@@ -44,12 +44,12 @@ public class SqlRuParse {
             Document doc = Jsoup.connect(link + "/" + i).get();
             Elements row = doc.select(".postslisttopic");
             for (Element td : row) {
-                Element href = td.parent();
+                Element href = td.child(0);
                 String linkForPost = href.attr("href");
-                String linkPost = String.valueOf(href.select(".messageHeader"));
-                if (linkPost.toLowerCase(Locale.ROOT).contains("java")
-                        && !linkPost.toLowerCase(Locale.ROOT).contains("javaScript")) {
-                    Post post = detail(linkPost);
+                String text = href.text().toLowerCase(Locale.ROOT);
+                if (text.contains("java")
+                        && !text.contains("javaScript")) {
+                    Post post = detail(linkForPost);
                     postOfLIst.add(post);
                 }
             }
@@ -59,7 +59,7 @@ public class SqlRuParse {
 
     Post detail(String link) throws IOException {
         Post post = new Post();
-        Document doc = Jsoup.connect(link).get();
+        Document doc = Jsoup.connect("https://www.sql.ru/forum/1323839/razrabotchik-java-g-kazan").get();
         post.setTitle(doc.select(".messageHeader").get(0).text());
         post.setDescription(doc.select(".msgBody").get(0).text());
         post.setLink(link);
