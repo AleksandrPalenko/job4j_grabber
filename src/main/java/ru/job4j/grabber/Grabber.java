@@ -26,7 +26,7 @@ public class Grabber implements Grab {
     /**
      * метод описывает соединение чтение файла с настройками
      * @return на выходе настройки
-     * @throws SQLException исключения ловим
+     * @throws SQLException исключение ловим
      */
     public Store store() {
         return new PsqlStore(cfg);
