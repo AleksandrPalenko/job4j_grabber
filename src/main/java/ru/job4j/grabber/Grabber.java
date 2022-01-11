@@ -1,15 +1,15 @@
 package ru.job4j.grabber;
+/**
+ * класс описывает работу с планировщиком, чтением и записью данных с сайта
+ */
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 import ru.job4j.grabber.utils.SqlRuDateTimeParser;
 import ru.job4j.html.SqlRuParse;
 
 import java.io.*;
-import java.sql.Connection;
-import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Properties;
 
@@ -20,30 +20,43 @@ import static org.quartz.TriggerBuilder.newTrigger;
 public class Grabber implements Grab {
     private final Properties cfg = new Properties();
 
+    /**
+     * метод описывает соединение чтение файла с настройками
+     * @return на выходе настройки
+     * @throws SQLException исключения ловим
+     */
     public Store store() {
         return new PsqlStore(cfg);
     }
 
+    /**
+     * метод описывает планировщика
+     * @return на выходе работающий планировщик
+     * @throws SchedulerException исключения ловим
+     */
     public Scheduler scheduler() throws SchedulerException {
         Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
         scheduler.start();
         return scheduler;
     }
 
+    /**
+     * метод описывает чтение файла с настройками
+     * @throws IOException ловим исключения, которые могут появиться
+     */
     public void cfg() throws IOException {
         try (InputStream in = new FileInputStream(new File("src/main/resources/app.properties"))) {
             cfg.load(in);
         }
     }
 
-    public static Connection connect(Properties properties) throws Exception {
-        Class.forName(properties.getProperty("driver-class-name"));
-        return DriverManager.getConnection(
-                properties.getProperty("url"),
-                properties.getProperty("username"),
-                properties.getProperty("password"));
-    }
-
+    /**
+     * инициализаци задания
+     * @param parse задание - парсер сайта
+     * @param store задание - добавление в бд
+     * @param scheduler расписание
+     * @throws SchedulerException исключения ловим
+     */
     @Override
     public void init(Parse parse, Store store, Scheduler scheduler) throws Exception {
             JobDataMap data = new JobDataMap();
@@ -64,15 +77,20 @@ public class Grabber implements Grab {
 
     public static class GrabJob implements Job {
 
+        /**
+         * метод описывает выполнение самого задания
+         * @param context на входе контекст
+         * @throws JobExecutionException исключения ловим
+         */
         @Override
         public void execute(JobExecutionContext context) throws JobExecutionException {
             JobDataMap map = context.getJobDetail().getJobDataMap();
             Store store = (Store) map.get("store");
             Parse parse = (Parse) map.get("parse");
-            String url = "https://www.sql.ru/forum/job-offers/";
+            String url = "https://www.sql.ru/forum/job-offers";
             List<Post> post = parse.list(url);
-            for (int i = 0; i <= 5; i++) {
-                store.save(post.get(i));
+            for (Post value : post) {
+                store.save(value);
             }
         }
     }
@@ -82,7 +100,6 @@ public class Grabber implements Grab {
         grab.cfg();
         Scheduler scheduler = grab.scheduler();
         Store store = grab.store();
-        SqlRuDateTimeParser dateTimeParser = new SqlRuDateTimeParser();
-        grab.init((Parse) new SqlRuParse(dateTimeParser), store, scheduler);
+        grab.init((Parse) new SqlRuParse(new SqlRuDateTimeParser()), store, scheduler);
     }
 }
