@@ -1,7 +1,7 @@
 create table schemaForPost (
     id   serial primary key,
     name varchar(255),
-    text varchar(255),
-    link varchar(255) unique,
+    text text,
+    link text unique,
     created timestamp
 );

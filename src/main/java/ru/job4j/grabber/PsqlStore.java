@@ -17,7 +17,7 @@ public class PsqlStore implements Store, AutoCloseable {
 
     private Connection cnn;
 
-    private static final Logger LOG = LoggerFactory.getLogger(AlertRabbit.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(PsqlStore.class.getName());
 
     public PsqlStore(Properties cfg) {
         try {
@@ -42,7 +42,7 @@ public class PsqlStore implements Store, AutoCloseable {
                 rs.getString("name"),
                 rs.getString("text"),
                 rs.getString("link"),
-                rs.getTimestamp("text").toLocalDateTime()
+                rs.getTimestamp("created").toLocalDateTime()
         );
     }
 
@@ -52,13 +52,12 @@ public class PsqlStore implements Store, AutoCloseable {
     сохраняет объявление в базе
      */
         try (PreparedStatement statement =
-                     cnn.prepareStatement("Insert into past(name, text, link, created) values (?, ?, ?, ?)",
+                     cnn.prepareStatement("Insert into post(name, text, link, created) values (?, ?, ?, ?)",
                              Statement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, post.getTitle());
             statement.setString(2, post.getDescription());
             statement.setString(3, post.getLink());
-            statement.setString(4, post.getLink());
-            statement.setTimestamp(5, Timestamp.valueOf(post.getCreated()));
+            statement.setTimestamp(4, Timestamp.valueOf(post.getCreated()));
             statement.execute();
             try (ResultSet rs = statement.getGeneratedKeys()) {
                 if (rs.next()) {
@@ -97,7 +96,7 @@ public class PsqlStore implements Store, AutoCloseable {
         try (PreparedStatement pr = cnn.prepareStatement("select * from post where id = ?")) {
             pr.setInt(1, id);
             try (ResultSet rs = pr.executeQuery()) {
-                while (rs.next()) {
+                if (rs.next()) {
                     postId = postMethod(rs);
                 }
             }
@@ -126,7 +125,7 @@ public class PsqlStore implements Store, AutoCloseable {
         SqlRuParse parse = new SqlRuParse(new SqlRuDateTimeParser());
         String url = "https://www.sql.ru/forum/job-offers/";
         List<Post> post = parse.list(url);
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i <= 5; i++) {
             ps.save(post.get(i));
         }
     }
