@@ -123,10 +123,15 @@ public class PsqlStore implements Store, AutoCloseable {
         }
         PsqlStore ps = new PsqlStore(config);
         SqlRuParse parse = new SqlRuParse(new SqlRuDateTimeParser());
+        System.out.println("---парсинг начат---");
         String url = "https://www.sql.ru/forum/job-offers/";
         List<Post> post = parse.list(url);
+        System.out.println("---парсинг закончен, записываем первые 5 постов---");
         for (int i = 0; i <= 5; i++) {
             ps.save(post.get(i));
         }
+        ps.getAll().forEach(System.out::println);
+        System.out.println("вывод поста с индексом 1");
+        System.out.println(ps.findById(1));
     }
 }
