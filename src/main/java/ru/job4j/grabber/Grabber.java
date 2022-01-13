@@ -91,7 +91,12 @@ public class Grabber implements Grab {
             Store store = (Store) map.get("store");
             Parse parse = (Parse) map.get("parse");
             String url = "https://www.sql.ru/forum/job-offers";
-            List<Post> post = parse.list(url);
+            List<Post> post = null;
+            try {
+                post = parse.list(url);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             for (Post value : post) {
                 store.save(value);
             }
@@ -106,7 +111,7 @@ public class Grabber implements Grab {
                     try (OutputStream out = socket.getOutputStream()) {
                         out.write("HTTP/1.1 200 OK\r\n\r\n".getBytes());
                         for (Post post : store.getAll()) {
-                            post.toString().getBytes(Charset.forName("Windows-1251"));
+                            out.write(post.toString().getBytes(Charset.forName("Windows-1251")));
                             out.write(System.lineSeparator().getBytes());
                         }
                     } catch (IOException io) {
@@ -124,7 +129,7 @@ public class Grabber implements Grab {
         grab.cfg();
         Scheduler scheduler = grab.scheduler();
         Store store = grab.store();
-        grab.init((Parse) new SqlRuParse(new SqlRuDateTimeParser()), store, scheduler);
+        grab.init(new SqlRuParse(new SqlRuDateTimeParser()), store, scheduler);
         grab.web(store);
     }
 }

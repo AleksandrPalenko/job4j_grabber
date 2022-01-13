@@ -4,6 +4,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import ru.job4j.grabber.Parse;
 import ru.job4j.grabber.Post;
 import ru.job4j.grabber.utils.DateTimeParser;
 import ru.job4j.grabber.utils.SqlRuDateTimeParser;
@@ -14,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class SqlRuParse {
+public class SqlRuParse implements Parse {
 
     private final DateTimeParser dateTimeParser;
 
@@ -57,7 +58,7 @@ public class SqlRuParse {
         return postOfLIst;
     }
 
-    Post detail(String link) throws IOException {
+    public Post detail(String link) throws IOException {
         Post post = new Post();
         Document doc = Jsoup.connect(link).get();
         post.setTitle(doc.select(".messageHeader").get(0).text());

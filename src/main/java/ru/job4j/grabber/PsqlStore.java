@@ -21,7 +21,7 @@ public class PsqlStore implements Store, AutoCloseable {
 
     public PsqlStore(Properties cfg) {
         try {
-            Class.forName(cfg.getProperty("jdbc.driver"));
+            Class.forName(cfg.getProperty("driver-class-name"));
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }
