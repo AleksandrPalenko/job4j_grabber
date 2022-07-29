@@ -10,6 +10,7 @@ import ru.job4j.grabber.utils.DateTimeParser;
 import ru.job4j.grabber.utils.SqlRuDateTimeParser;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +37,7 @@ public class SqlRuParse implements Parse {
      * @return модель с данными.
      */
 
-    public List<Post> list(String link) throws IOException {
+    public List<Post> list(String link) throws IOException, ParseException {
         /*в list нужно добавить цикл для парсинга 5 страниц и,
     используя ссылки на вакансии, парсить их в Post методом detail.
     */
@@ -58,7 +59,7 @@ public class SqlRuParse implements Parse {
         return postOfLIst;
     }
 
-    public Post detail(String link) throws IOException {
+    public Post detail(String link) throws IOException, ParseException {
         Post post = new Post();
         Document doc = Jsoup.connect(link).get();
         post.setTitle(doc.select(".messageHeader").get(0).text());
@@ -70,7 +71,7 @@ public class SqlRuParse implements Parse {
         return post;
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, ParseException {
         SqlRuDateTimeParser dateTimeParser = new SqlRuDateTimeParser();
         SqlRuParse sqlRuParse = new SqlRuParse(dateTimeParser);
         System.out.println(sqlRuParse.detail("https://www.sql.ru/forum/1323839/razrabotchik-java-g-kazan"));

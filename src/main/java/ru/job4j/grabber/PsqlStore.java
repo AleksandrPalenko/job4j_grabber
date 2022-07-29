@@ -9,6 +9,7 @@ import ru.job4j.quartz.AlertRabbit;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.*;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -113,7 +114,7 @@ public class PsqlStore implements Store, AutoCloseable {
         }
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, ParseException {
         Properties config = new Properties();
         try (InputStream in = PsqlStore.class.getClassLoader()
                 .getResourceAsStream("post.properties")) {

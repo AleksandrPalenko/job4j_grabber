@@ -13,6 +13,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.Charset;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.util.List;
 import java.util.Properties;
 
@@ -94,7 +95,7 @@ public class Grabber implements Grab {
             List<Post> post = null;
             try {
                 post = parse.list(url);
-            } catch (IOException e) {
+            } catch (IOException | ParseException e) {
                 e.printStackTrace();
             }
             for (Post value : post) {
